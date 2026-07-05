@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://13coq8nj1c80"]
+
+[ext_resource type="Script" uid="uid://dhnqffvmmc2p3" path="res://entities/player/player.gd" id="1_symyc"]
+[ext_resource type="PackedScene" uid="uid://dserp3ol28j2h" path="res://component/player_input_synchronizer_component.tscn" id="2_abrql"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_abrql"]
+properties/0/path = NodePath(".:global_position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_12j5o"]
+size = Vector2(18, 32)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_12j5o"]
+
+[node name="Player" type="CharacterBody2D" unique_id=126363585]
+collision_layer = 0
+script = ExtResource("1_symyc")
+
+[node name="PlayerInputSynchronizerComponent" parent="." unique_id=348382715 instance=ExtResource("2_abrql")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1425543900]
+replication_config = SubResource("SceneReplicationConfig_abrql")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=787258821]
+position = Vector2(0, -16)
+texture = SubResource("PlaceholderTexture2D_12j5o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=730989961]
+position = Vector2(0, -10)
+shape = SubResource("CircleShape2D_12j5o")
