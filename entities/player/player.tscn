@@ -27,6 +27,10 @@ texture = ExtResource("3_bls4j")
 centered = false
 offset = Vector2(-9, -26)
 
+[node name="FireRateTimer" type="Timer" parent="." unique_id=340422313]
+wait_time = 0.25
+one_shot = true
+
 [node name="WeaponRoot" type="Node2D" parent="." unique_id=542181546]
 position = Vector2(0, -9)
 

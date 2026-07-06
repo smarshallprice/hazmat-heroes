@@ -4,6 +4,8 @@ extends CharacterBody2D
 
 @onready var player_input_syncronizer_component:PlayerInputSynchronizerComponent = $PlayerInputSynchronizerComponent
 @onready var weapon_root:Node2D = $WeaponRoot
+@onready var fire_rate_timer:Timer = $FireRateTimer
+
 
 var bullet_scene:PackedScene = preload("uid://bpomv1fpftth5")
 
@@ -14,9 +16,9 @@ func _ready():
 	player_input_syncronizer_component.set_multiplayer_authority(input_multiplayer_authority);
 	
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("attack"):
-		create_bullet()
+# func _input(event: InputEvent) -> void:
+# 	if event.is_action_pressed("attack"):
+# 		create_bullet()
 		
 
 func _process(delta: float) -> void:
@@ -25,11 +27,18 @@ func _process(delta: float) -> void:
 	if is_multiplayer_authority():
 		velocity = player_input_syncronizer_component.movement_vector * 100
 		move_and_slide()
+		if player_input_syncronizer_component.is_attack_pressed:
+			try_create_bullet()
 
-func  create_bullet():
+func  try_create_bullet():
+	if !fire_rate_timer.is_stopped():
+		return
+
+	#TODO: create client only visual bullet immediatly, so we dont have to wait for server round trip from spawner
 	var bullet = bullet_scene.instantiate() as Bullet
 	bullet.global_position = weapon_root.global_position
-	get_parent().add_child(bullet)
 	bullet.start(player_input_syncronizer_component.aim_vector)
+	get_parent().add_child(bullet,true)
+	fire_rate_timer.start()
 
 	#get_tree().current_scene.add_child(bullet)
