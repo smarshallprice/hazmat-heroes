@@ -1,10 +1,60 @@
 [gd_scene format=3 uid="uid://dnhh42ul1davo"]
 
 [ext_resource type="Script" uid="uid://7up820ovv22s" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Texture2D" uid="uid://bklmk4tetyj0l" path="res://assets/arena.png" id="2_0xm2m"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_12j5o"]
+size = Vector2(32, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h2yge"]
+size = Vector2(500, 32)
 
 [node name="Main" type="Node" unique_id=992897290]
 script = ExtResource("1_ig7tw")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=676528008]
-_spawnable_scenes = PackedStringArray("uid://bpomv1fpftth5")
+_spawnable_scenes = PackedStringArray("uid://bpomv1fpftth5", "uid://dlt0fcljhaf06")
 spawn_path = NodePath("..")
+
+[node name="PlayerSpawnPosition" type="Marker2D" parent="." unique_id=1590552301]
+position = Vector2(320, 185)
+metadata/_edit_lock_ = true
+
+[node name="Arena" type="Sprite2D" parent="." unique_id=198697144]
+position = Vector2(320, 185)
+texture = ExtResource("2_0xm2m")
+metadata/_edit_lock_ = true
+
+[node name="StaticBodies" type="Node2D" parent="." unique_id=947324102]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="StaticBodies" unique_id=295045808]
+position = Vector2(79, 186)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBodies/StaticBody2D" unique_id=578515041]
+shape = SubResource("RectangleShape2D_12j5o")
+metadata/_edit_lock_ = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="StaticBodies" unique_id=2091229158]
+position = Vector2(561, 183)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBodies/StaticBody2D2" unique_id=2110436869]
+shape = SubResource("RectangleShape2D_12j5o")
+metadata/_edit_lock_ = true
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="StaticBodies" unique_id=2014342975]
+position = Vector2(330, 40)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBodies/StaticBody2D3" unique_id=984187517]
+shape = SubResource("RectangleShape2D_h2yge")
+metadata/_edit_lock_ = true
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="StaticBodies" unique_id=2075241649]
+position = Vector2(332, 324)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBodies/StaticBody2D4" unique_id=1580865474]
+shape = SubResource("RectangleShape2D_h2yge")
+metadata/_edit_lock_ = true
