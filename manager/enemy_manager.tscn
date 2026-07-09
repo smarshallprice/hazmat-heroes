@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bxliswkcsyyfv"]
+
+[ext_resource type="Script" uid="uid://cwdidlvxps7bw" path="res://manager/enemy_manager.gd" id="1_fq440"]
+[ext_resource type="PackedScene" uid="uid://dlt0fcljhaf06" path="res://entities/enemy/enemy.tscn" id="2_46ilc"]
+
+[node name="EnemyManager" type="Node" unique_id=423964494]
+script = ExtResource("1_fq440")
+enemy_scene = ExtResource("2_46ilc")
+
+[node name="SpawnIntervalTimer" type="Timer" parent="." unique_id=1588555573]
+autostart = true

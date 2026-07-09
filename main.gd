@@ -1,7 +1,6 @@
 extends Node
 
 var player_scene:PackedScene = preload("uid://13coq8nj1c80")
-var enemey_scene:PackedScene = preload("uid://dlt0fcljhaf06")
 
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
 @onready var player_spawn_position:Marker2D = $PlayerSpawnPosition
@@ -20,11 +19,6 @@ func _ready():
      #host will be waiting in a lobby, waiting for other connected peers to join, and then will start the game when ready
      # peer tells server it is ready
     peer_ready.rpc_id(1)
-
-    if is_multiplayer_authority():
-        var enemey = enemey_scene.instantiate() as Enemy
-        enemey.global_position = Vector2(200,200)
-        add_child(enemey,true)
    
     
 
