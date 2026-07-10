@@ -1,18 +1,42 @@
 class_name EnemyManager
 extends Node
 
+const ROUND_BASE_TIME:int = 10
+const ROUND_GROWTH:int = 5
+const BASE_ENEMY_SPAWN_TIME:float = 2
+const BASE_ENEMY_SPAWN_TIME_GROWTH:float = -.15 #as rounbds increase, descrease time between spawns by .15 secs
+
 @export var enemy_scene:PackedScene
 @export var enemy_spawn_root:Node
 @export var spawn_rect:ReferenceRect
 
 @onready var spawn_internval_timer:Timer = $SpawnIntervalTimer
+@onready var round_timer:Timer = $RoundTimer 
+
+var round_count := 0
 
 func _ready() -> void:
     spawn_internval_timer.timeout.connect(_on_spawn_interval_timer_timeout)
+    round_timer.timeout.connect(_on_round_timer_timeout)
+    begin_round()
+
+#round are goingb to be longer, based on round count
+#enemies will spawn quicker based on round count
+func begin_round()->void:
+    round_count += 1
+    #add  5 seconds (ROUND_GROWTH) after base time after first round. Video 22 - 5:30
+    round_timer.wait_time = ROUND_BASE_TIME + ((round_count - 1) * ROUND_GROWTH)
+    round_timer.start()
+
+    #first round will have base time, then we descrease (BASE_ENEMY_SPAWN_TIME_GROWTH) that after first 
+    spawn_internval_timer.wait_time = BASE_ENEMY_SPAWN_TIME+ ((round_count - 1) * BASE_ENEMY_SPAWN_TIME_GROWTH)
+    spawn_internval_timer.start()
+
 
 func _on_spawn_interval_timer_timeout() -> void:
     if is_multiplayer_authority():
         spawn_enemy()
+        spawn_internval_timer.start()
 
 func spawn_enemy() -> void:
     var enemy = enemy_scene.instantiate() as Enemy
@@ -24,3 +48,8 @@ func get_random_spawn_position():
     var y = randi_range(0, spawn_rect.size.y)
 
     return spawn_rect.global_position + Vector2(x,y)
+
+func _on_round_timer_timeout()->void:
+    if is_multiplayer_authority():
+        spawn_internval_timer.stop()
+        print("round over")

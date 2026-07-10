@@ -6,7 +6,7 @@
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_im2q6"]
 properties/0/path = NodePath(".:global_position")
 properties/0/spawn = true
-properties/0/replication_mode = 0
+properties/0/replication_mode = 1
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_12j5o"]
 size = Vector2(16, 24)
@@ -21,6 +21,10 @@ script = ExtResource("1_im2q6")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1718204164]
 replication_config = SubResource("SceneReplicationConfig_im2q6")
+
+[node name="TargetAvquisitionTimer" type="Timer" parent="." unique_id=931314591]
+wait_time = 0.2
+autostart = true
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1640220654]
 position = Vector2(0, -12)
