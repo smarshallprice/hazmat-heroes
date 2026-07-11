@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c5ar67sarsb1p" path="res://entities/enemy/enemy.gd" id="1_im2q6"]
 [ext_resource type="Texture2D" uid="uid://kb0cn83asj0o" path="res://entities/enemy/enemy_medium.png" id="1_ksmh7"]
+[ext_resource type="PackedScene" uid="uid://cgclxaub4sjmi" path="res://component/health_component.tscn" id="2_3fvr7"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_im2q6"]
 properties/0/path = NodePath(".:global_position")
@@ -21,6 +22,9 @@ script = ExtResource("1_im2q6")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1718204164]
 replication_config = SubResource("SceneReplicationConfig_im2q6")
+
+[node name="HealthComponent" parent="." unique_id=739731049 instance=ExtResource("2_3fvr7")]
+max_health = 2
 
 [node name="TargetAvquisitionTimer" type="Timer" parent="." unique_id=931314591]
 wait_time = 0.2
