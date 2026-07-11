@@ -1,15 +1,14 @@
 class_name Enemy
 extends CharacterBody2D
 
-@onready var area_2d:Area2D = $Area2D
 @onready var target_acquisition_timer:Timer = $TargetAvquisitionTimer
 @onready var health_component : HealthComponent = $HealthComponent
 
 var target_position:Vector2
 
-func _ready() -> void:
-    area_2d.area_entered.connect(_on_area_entered)
+func _ready() -> void:   
     target_acquisition_timer.timeout.connect(_on_target_acquistion_timeout)
+
     if is_multiplayer_authority():
         #get target on spawn
         acquire_target()
@@ -21,8 +20,6 @@ func _process(delta: float) -> void:
         velocity = global_position.direction_to(target_position) * 40
         move_and_slide()
 
-func  handle_hit() -> void:
-    health_component.damage(1)
 
 func acquire_target()-> void:
     #Get all the players via player group
@@ -45,14 +42,6 @@ func acquire_target()-> void:
     if nearest_player != null:
         target_position = nearest_player.global_position
         
-
-func _on_area_entered(other_area: Area2D) -> void:
-    if !is_multiplayer_authority():
-        return
-    if  other_area.owner is Bullet:
-        var bullet = other_area.owner as Bullet
-        bullet.register_collision()
-        handle_hit()
 
 func _on_target_acquistion_timeout()-> void:
     if is_multiplayer_authority():
