@@ -3,12 +3,16 @@
 [ext_resource type="Script" uid="uid://c5ar67sarsb1p" path="res://entities/enemy/enemy.gd" id="1_im2q6"]
 [ext_resource type="Texture2D" uid="uid://kb0cn83asj0o" path="res://entities/enemy/enemy_medium.png" id="1_ksmh7"]
 [ext_resource type="PackedScene" uid="uid://cgclxaub4sjmi" path="res://component/health_component.tscn" id="2_3fvr7"]
+[ext_resource type="PackedScene" uid="uid://bygviyq5432rx" path="res://component/hitbox_component.tscn" id="3_4wwj3"]
 [ext_resource type="PackedScene" uid="uid://vqb40qkcscxq" path="res://component/hurtbox_component.tscn" id="4_dt443"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_im2q6"]
 properties/0/path = NodePath(".:global_position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_61ot5"]
+size = Vector2(9, 13)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4wwj3"]
 size = Vector2(16, 24)
@@ -30,6 +34,14 @@ max_health = 2
 [node name="TargetAvquisitionTimer" type="Timer" parent="." unique_id=931314591]
 wait_time = 0.2
 autostart = true
+
+[node name="HitboxComponent" parent="." unique_id=286220484 instance=ExtResource("3_4wwj3")]
+position = Vector2(0, -10)
+collision_layer = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent" unique_id=631597443]
+position = Vector2(-0.5, -0.5)
+shape = SubResource("RectangleShape2D_61ot5")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=853482554]
 texture = ExtResource("1_ksmh7")
