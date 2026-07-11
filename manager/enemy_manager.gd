@@ -14,10 +14,13 @@ const BASE_ENEMY_SPAWN_TIME_GROWTH:float = -.15 #as rounbds increase, descrease 
 @onready var round_timer:Timer = $RoundTimer 
 
 var round_count := 0
+var spawned_enemies := 0
+
 
 func _ready() -> void:
     spawn_internval_timer.timeout.connect(_on_spawn_interval_timer_timeout)
     round_timer.timeout.connect(_on_round_timer_timeout)
+    GameEvents.enemy_died.connect(_on_enemy_died)
     begin_round()
 
 #round are goingb to be longer, based on round count
@@ -31,7 +34,15 @@ func begin_round()->void:
     #first round will have base time, then we descrease (BASE_ENEMY_SPAWN_TIME_GROWTH) that after first 
     spawn_internval_timer.wait_time = BASE_ENEMY_SPAWN_TIME+ ((round_count - 1) * BASE_ENEMY_SPAWN_TIME_GROWTH)
     spawn_internval_timer.start()
+    print("beginning round %s " % round_count)
 
+func check_round_completed():
+    if !round_timer.is_stopped():
+        return
+    
+    if spawned_enemies == 0:
+        print("round comeplete")
+        begin_round()
 
 func _on_spawn_interval_timer_timeout() -> void:
     if is_multiplayer_authority():
@@ -42,6 +53,7 @@ func spawn_enemy() -> void:
     var enemy = enemy_scene.instantiate() as Enemy
     enemy.global_position = get_random_spawn_position()
     enemy_spawn_root.add_child(enemy, true)
+    spawned_enemies += 1
 
 func get_random_spawn_position():
     var x = randi_range(0, spawn_rect.size.x)
@@ -53,3 +65,9 @@ func _on_round_timer_timeout()->void:
     if is_multiplayer_authority():
         spawn_internval_timer.stop()
         print("round over")
+        check_round_completed()
+
+
+func _on_enemy_died():
+    spawned_enemies -= 1
+    check_round_completed()
