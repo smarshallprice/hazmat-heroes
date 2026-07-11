@@ -15,8 +15,8 @@ func _ready():
 func _process(delta: float) -> void:
     global_position += direction * SPEED * delta
 
-func start(direction:Vector2):
-    self.direction = direction
+func start(dir:Vector2):
+    direction = dir
     rotation = direction.angle()
 
 func register_collision():

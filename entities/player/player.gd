@@ -22,7 +22,7 @@ func _ready():
 # 		create_bullet()
 		
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	weapon_root.look_at(weapon_root.global_position + player_input_syncronizer_component.aim_vector)
 	#as if of now, this is only the server. The client only as authority over input synchronizer
 	if is_multiplayer_authority():
