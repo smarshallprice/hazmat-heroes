@@ -8,8 +8,10 @@ extends CharacterBody2D
 @onready var health_component:HealthComponent = $HealthComponent
 @onready var Visuals:Node2D = $Visuals
 @onready var animation_player:AnimationPlayer = $AnimationPlayer
+@onready var barrel_position:Marker2D = $Visuals/WeaponRoot/WeaponAnimationRoot/BarrelPosition
 
 var bullet_scene:PackedScene = preload("uid://bpomv1fpftth5")
+var muzzle_flash_scene:PackedScene = preload("uid://brqekydgbtkul")
 
 # we need this because when we spawn the player via the network spawn, the Synchronizer component is null because this the player node is not yet added to scene tree
 var input_multiplayer_authority:int
@@ -47,7 +49,7 @@ func  try_fire():
 
 	#TODO: create client only visual bullet immediatly, so we dont have to wait for server round trip from spawner
 	var bullet = bullet_scene.instantiate() as Bullet
-	bullet.global_position = weapon_root.global_position
+	bullet.global_position = barrel_position.global_position
 	bullet.start(player_input_syncronizer_component.aim_vector)
 	get_parent().add_child(bullet,true)
 	fire_rate_timer.start()
@@ -63,6 +65,11 @@ func play_fire_effects():
 	if animation_player.is_playing():
 		animation_player.stop()
 	animation_player.play("fire")
+
+	var muzzle_flash = muzzle_flash_scene.instantiate() as Node2D
+	muzzle_flash.global_position = barrel_position.global_position
+	muzzle_flash.rotation = barrel_position.global_rotation
+	get_parent().add_child(muzzle_flash)
 
 func _on_died() -> void:
 	print("player died")

@@ -113,6 +113,9 @@ position = Vector2(0, -9)
 [node name="WeaponAnimationRoot" type="Node2D" parent="Visuals/WeaponRoot" unique_id=1597552225]
 position = Vector2(6, 0)
 
+[node name="BarrelPosition" type="Marker2D" parent="Visuals/WeaponRoot/WeaponAnimationRoot" unique_id=1637418186]
+position = Vector2(19, -2)
+
 [node name="Sprite2D" type="Sprite2D" parent="Visuals/WeaponRoot/WeaponAnimationRoot" unique_id=1279291452]
 position = Vector2(6, 0)
 texture = ExtResource("4_fkugw")
