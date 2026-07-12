@@ -7,6 +7,7 @@ extends CharacterBody2D
 @onready var fire_rate_timer:Timer = $FireRateTimer
 @onready var health_component:HealthComponent = $HealthComponent
 @onready var Visuals:Node2D = $Visuals
+@onready var animation_player:AnimationPlayer = $AnimationPlayer
 
 var bullet_scene:PackedScene = preload("uid://bpomv1fpftth5")
 
@@ -30,7 +31,7 @@ func _process(_delta: float) -> void:
 		velocity = player_input_syncronizer_component.movement_vector * 100
 		move_and_slide()
 		if player_input_syncronizer_component.is_attack_pressed:
-			try_create_bullet()
+			try_fire()
 
 func update_aim_position():
 	var aim_vector = player_input_syncronizer_component.aim_vector
@@ -40,7 +41,7 @@ func update_aim_position():
 	Visuals.scale = Vector2.ONE if aim_vector.x >= 0 else Vector2(-1,1)
 	weapon_root.look_at(aim_position)
 
-func  try_create_bullet():
+func  try_fire():
 	if !fire_rate_timer.is_stopped():
 		return
 
@@ -51,7 +52,17 @@ func  try_create_bullet():
 	get_parent().add_child(bullet,true)
 	fire_rate_timer.start()
 
-	#get_tree().current_scene.add_child(bullet)
+	#try_fire is on the server, so we need to tell the clients to play the fire effects
+	play_fire_effects.rpc()
+
+
+@rpc("authority", "call_local", "unreliable")
+func play_fire_effects():
+	#animations dont reset when we trigger animation again
+	#so we want to stop it if it is already playing
+	if animation_player.is_playing():
+		animation_player.stop()
+	animation_player.play("fire")
 
 func _on_died() -> void:
 	print("player died")
