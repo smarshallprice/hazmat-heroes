@@ -14,12 +14,12 @@ size = Vector2(500, 32)
 script = ExtResource("1_ig7tw")
 
 [node name="EnemyManager" parent="." unique_id=423964494 node_paths=PackedStringArray("enemy_spawn_root", "spawn_rect") instance=ExtResource("2_h2yge")]
-enemy_spawn_root = NodePath("..")
+enemy_spawn_root = NodePath("../YSortRoot")
 spawn_rect = NodePath("../SpawnRect")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="." unique_id=676528008]
 _spawnable_scenes = PackedStringArray("uid://bpomv1fpftth5", "uid://dlt0fcljhaf06")
-spawn_path = NodePath("..")
+spawn_path = NodePath("../YSortRoot")
 
 [node name="PlayerSpawnPosition" type="Marker2D" parent="." unique_id=1590552301]
 position = Vector2(320, 185)
@@ -72,4 +72,8 @@ collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBodies/StaticBody2D4" unique_id=1580865474]
 shape = SubResource("RectangleShape2D_h2yge")
+metadata/_edit_lock_ = true
+
+[node name="YSortRoot" type="Node2D" parent="." unique_id=1790057892]
+y_sort_enabled = true
 metadata/_edit_lock_ = true

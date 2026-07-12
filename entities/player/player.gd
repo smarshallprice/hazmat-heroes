@@ -3,9 +3,10 @@ class_name Player
 extends CharacterBody2D
 
 @onready var player_input_syncronizer_component:PlayerInputSynchronizerComponent = $PlayerInputSynchronizerComponent
-@onready var weapon_root:Node2D = $WeaponRoot
+@onready var weapon_root:Node2D = $Visuals/WeaponRoot
 @onready var fire_rate_timer:Timer = $FireRateTimer
 @onready var health_component:HealthComponent = $HealthComponent
+@onready var Visuals:Node2D = $Visuals
 
 var bullet_scene:PackedScene = preload("uid://bpomv1fpftth5")
 
@@ -23,13 +24,21 @@ func _ready():
 		
 
 func _process(_delta: float) -> void:
-	weapon_root.look_at(weapon_root.global_position + player_input_syncronizer_component.aim_vector)
+	update_aim_position()
 	#as if of now, this is only the server. The client only as authority over input synchronizer
 	if is_multiplayer_authority():
 		velocity = player_input_syncronizer_component.movement_vector * 100
 		move_and_slide()
 		if player_input_syncronizer_component.is_attack_pressed:
 			try_create_bullet()
+
+func update_aim_position():
+	var aim_vector = player_input_syncronizer_component.aim_vector
+	var aim_position = weapon_root.global_position + aim_vector
+
+	#bc aim_positrion is a unit vector, we can do this
+	Visuals.scale = Vector2.ONE if aim_vector.x >= 0 else Vector2(-1,1)
+	weapon_root.look_at(aim_position)
 
 func  try_create_bullet():
 	if !fire_rate_timer.is_stopped():
