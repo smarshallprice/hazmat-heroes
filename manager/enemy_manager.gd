@@ -1,6 +1,8 @@
 class_name EnemyManager
 extends Node
 
+signal round_began(round_number: int)
+
 const ROUND_BASE_TIME:int = 10
 const ROUND_GROWTH:int = 5
 const BASE_ENEMY_SPAWN_TIME:float = 2
@@ -23,6 +25,9 @@ func _ready() -> void:
     GameEvents.enemy_died.connect(_on_enemy_died)
     begin_round()
 
+func get_round_time_remaining()->float:
+    return round_timer.time_left
+
 #round are goingb to be longer, based on round count
 #enemies will spawn quicker based on round count
 func begin_round()->void:
@@ -34,7 +39,7 @@ func begin_round()->void:
     #first round will have base time, then we descrease (BASE_ENEMY_SPAWN_TIME_GROWTH) that after first 
     spawn_internval_timer.wait_time = BASE_ENEMY_SPAWN_TIME+ ((round_count - 1) * BASE_ENEMY_SPAWN_TIME_GROWTH)
     spawn_internval_timer.start()
-    print("beginning round %s " % round_count)
+    round_began.emit(round_count)
 
 func check_round_completed():
     if !round_timer.is_stopped():
