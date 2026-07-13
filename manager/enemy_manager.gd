@@ -1,7 +1,7 @@
 class_name EnemyManager
 extends Node
 
-signal round_began(round_number: int)
+signal round_changed(round_number: int)
 
 const ROUND_BASE_TIME:int = 10
 const ROUND_GROWTH:int = 5
@@ -15,7 +15,14 @@ const BASE_ENEMY_SPAWN_TIME_GROWTH:float = -.15 #as rounbds increase, descrease 
 @onready var spawn_internval_timer:Timer = $SpawnIntervalTimer
 @onready var round_timer:Timer = $RoundTimer 
 
-var round_count := 0
+var _round_count:int = 0
+var round_count : int:
+    get:
+        return _round_count
+    set(value):
+        _round_count = value
+        round_changed.emit(_round_count)
+
 var spawned_enemies := 0
 
 
@@ -23,7 +30,32 @@ func _ready() -> void:
     spawn_internval_timer.timeout.connect(_on_spawn_interval_timer_timeout)
     round_timer.timeout.connect(_on_round_timer_timeout)
     GameEvents.enemy_died.connect(_on_enemy_died)
-    begin_round()
+
+    if is_multiplayer_authority():
+        begin_round()
+
+func synchronize(to_peer_id: int = -1) -> void:
+    if !is_multiplayer_authority():
+        return  
+    var data = {
+        "round_timer_is_running": !round_timer.is_stopped(),
+        "round_timer_time_left": round_timer.time_left,
+        "round_count": round_count
+    }   
+
+    if to_peer_id > -1 && to_peer_id != 1:#call on single client but ignore server
+        #call on single client incase they are a late joiner, or just joined the game,
+        _synchronize.rpc_id(to_peer_id, data)
+    else:
+        #call on all clients enemy manager, IE, we began a new wave
+        _synchronize.rpc(data)
+
+@rpc("authority", "call_remote", "reliable")
+func _synchronize(data:Dictionary):
+    round_timer.wait_time = data["round_timer_time_left"]
+    if data["round_timer_is_running"]:
+        round_timer.start()
+    round_count = data["round_count"]
 
 func get_round_time_remaining()->float:
     return round_timer.time_left
@@ -39,7 +71,8 @@ func begin_round()->void:
     #first round will have base time, then we descrease (BASE_ENEMY_SPAWN_TIME_GROWTH) that after first 
     spawn_internval_timer.wait_time = BASE_ENEMY_SPAWN_TIME+ ((round_count - 1) * BASE_ENEMY_SPAWN_TIME_GROWTH)
     spawn_internval_timer.start()
-    round_began.emit(round_count)
+
+    synchronize()
 
 func check_round_completed():
     if !round_timer.is_stopped():

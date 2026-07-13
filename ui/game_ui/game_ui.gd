@@ -7,7 +7,7 @@ extends CanvasLayer
 
 
 func _ready() -> void:
-    enemy_manager.round_began.connect(_on_round_began)
+    enemy_manager.round_changed.connect(_on_round_began)
 
 
 func _process(_delta: float) -> void:

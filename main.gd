@@ -4,6 +4,7 @@ var player_scene:PackedScene = preload("uid://13coq8nj1c80")
 
 @onready var multiplayer_spawner: MultiplayerSpawner = $MultiplayerSpawner
 @onready var player_spawn_position:Marker2D = $PlayerSpawnPosition
+@onready var enemy_manager:EnemyManager =$EnemyManager
 
 
 func _ready():
@@ -25,6 +26,8 @@ func _ready():
 #we need a way for clients to tell server it is ready id:iam on the main scene create my instance for me.
 @rpc("any_peer", "call_local", "reliable") #call local is better for peer hosting, call_remote means server cannot call this function
 func peer_ready():
+    #called on server
     print("peer %s reeady" % multiplayer.get_remote_sender_id()) #which peer sent this message
     var sender_id = multiplayer.get_remote_sender_id()
     multiplayer_spawner.spawn({"peer_id" : sender_id})
+    enemy_manager.synchronize(sender_id)
