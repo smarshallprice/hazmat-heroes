@@ -37,7 +37,15 @@ max_health = 2
 
 [node name="TargetAvquisitionTimer" type="Timer" parent="." unique_id=931314591]
 wait_time = 0.2
-autostart = true
+one_shot = true
+
+[node name="AttackCoolDownTimer" type="Timer" parent="." unique_id=754630360]
+wait_time = 4.0
+one_shot = true
+
+[node name="ChargeAttackTimer" type="Timer" parent="." unique_id=384761715]
+wait_time = 0.5
+one_shot = true
 
 [node name="HurtboxComponent" parent="." unique_id=1306784966 node_paths=PackedStringArray("health_component") instance=ExtResource("4_dt443")]
 position = Vector2(0, 1)
@@ -62,6 +70,7 @@ shape = SubResource("CircleShape2D_12j5o")
 position = Vector2(0, -10)
 collision_layer = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent" unique_id=631597443]
+[node name="HitboxCollisionShape" type="CollisionShape2D" parent="HitboxComponent" unique_id=631597443]
+unique_name_in_owner = true
 position = Vector2(-0.5, -0.5)
 shape = SubResource("RectangleShape2D_61ot5")
