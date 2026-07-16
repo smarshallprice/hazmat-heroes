@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://kb0cn83asj0o" path="res://entities/enemy/enemy_medium.png" id="1_ksmh7"]
 [ext_resource type="PackedScene" uid="uid://cgclxaub4sjmi" path="res://component/health_component.tscn" id="2_3fvr7"]
 [ext_resource type="PackedScene" uid="uid://bygviyq5432rx" path="res://component/hitbox_component.tscn" id="3_4wwj3"]
+[ext_resource type="Texture2D" uid="uid://mt0almpxirgt" path="res://entities/enemy/attack_alert.png" id="4_d50e0"]
 [ext_resource type="PackedScene" uid="uid://vqb40qkcscxq" path="res://component/hurtbox_component.tscn" id="4_dt443"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_im2q6"]
@@ -54,6 +55,10 @@ health_component = NodePath("../HealthComponent")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent" unique_id=1571544605]
 position = Vector2(0, -13)
 shape = SubResource("RectangleShape2D_4wwj3")
+
+[node name="AlertSprite" type="Sprite2D" parent="." unique_id=1582172229]
+position = Vector2(0, -30)
+texture = ExtResource("4_d50e0")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=1266172862]
 
