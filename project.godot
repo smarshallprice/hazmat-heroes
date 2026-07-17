@@ -12,13 +12,13 @@ config_version=5
 
 config/name="MatchTastic"
 run/main_scene="uid://bhuy3ga7evxc6"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-GameEvents="*uid://blnowqttr6ac5"
 Background="*uid://bh286185urasm"
+GameEvents="*uid://drtxgxr6a2ko"
 
 [display]
 
@@ -27,6 +27,10 @@ window/size/viewport_height=360
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
+
+[dotnet]
+
+project/assembly_name="MatchTastic"
 
 [gui]
 

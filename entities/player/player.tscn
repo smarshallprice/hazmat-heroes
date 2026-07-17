@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://13coq8nj1c80"]
 
-[ext_resource type="Script" uid="uid://dhnqffvmmc2p3" path="res://entities/player/player.gd" id="1_symyc"]
+[ext_resource type="Script" uid="uid://drluywcpcrua6" path="res://entities/player/Player.cs" id="1_8fjmc"]
 [ext_resource type="PackedScene" uid="uid://dserp3ol28j2h" path="res://component/player_input_synchronizer_component.tscn" id="2_abrql"]
 [ext_resource type="PackedScene" uid="uid://cgclxaub4sjmi" path="res://component/health_component.tscn" id="3_8fjmc"]
 [ext_resource type="Texture2D" uid="uid://cc0u1dn2lq14h" path="res://entities/player/player-medium.png" id="3_bls4j"]
@@ -70,7 +70,7 @@ _data = {
 }
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_abrql"]
-properties/0/path = NodePath(".:global_position")
+properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
 
@@ -82,19 +82,18 @@ radius = 5.0
 [node name="Player" type="CharacterBody2D" unique_id=126363585 groups=["player"]]
 collision_layer = 0
 motion_mode = 1
-script = ExtResource("1_symyc")
+script = ExtResource("1_8fjmc")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1609873940]
 libraries/ = SubResource("AnimationLibrary_26q78")
 
-[node name="PlayerInputSynchronizerComponent" parent="." unique_id=348382715 node_paths=PackedStringArray("aim_root") instance=ExtResource("2_abrql")]
-aim_root = NodePath("../Visuals/WeaponRoot")
+[node name="PlayerInputSynchronizerComponent" parent="." unique_id=348382715 node_paths=PackedStringArray("AimRoot") instance=ExtResource("2_abrql")]
+AimRoot = NodePath("../Visuals/WeaponRoot")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1425543900]
 replication_config = SubResource("SceneReplicationConfig_abrql")
 
 [node name="HealthComponent" parent="." unique_id=739731049 instance=ExtResource("3_8fjmc")]
-max_health = 5
 
 [node name="FireRateTimer" type="Timer" parent="." unique_id=340422313]
 wait_time = 0.25
@@ -125,10 +124,10 @@ visible = false
 position = Vector2(0, -10)
 shape = SubResource("CircleShape2D_12j5o")
 
-[node name="HurtboxComponent" parent="." unique_id=1306784966 node_paths=PackedStringArray("health_component") instance=ExtResource("6_qiwj3")]
+[node name="HurtboxComponent" parent="." unique_id=1306784966 node_paths=PackedStringArray("HealthComponent") instance=ExtResource("6_qiwj3")]
 position = Vector2(0, -10)
 collision_mask = 4
-health_component = NodePath("../HealthComponent")
+HealthComponent = NodePath("../HealthComponent")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent" unique_id=410368452]
 shape = SubResource("CircleShape2D_61ot5")
