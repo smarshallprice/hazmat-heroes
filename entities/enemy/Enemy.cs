@@ -2,7 +2,7 @@ using Godot;
 
 namespace MatchTastic;
 
-[GlobalClass]
+[GlobalClass, SceneTree]
 public partial class Enemy : CharacterBody2D
 {
     [Export]
@@ -15,13 +15,13 @@ public partial class Enemy : CharacterBody2D
         set => _stateMachine.ChangeState(value);
     }
 
-    private Timer _targetAcquisitionTimer;
-    private HealthComponent _healthComponent;
-    private Node2D _visuals;
-    private Timer _attackCooldownTimer;
-    private Timer _chargeAttackTimer;
-    private CollisionShape2D _hitboxCollisionShape;
-    private Sprite2D _alertSprite;
+    //private Timer _targetAcquisitionTimer;
+   // private HealthComponent _healthComponent;
+   // private Node2D _visuals;
+    //private Timer _attackCooldownTimer;
+    //private Timer _chargeAttackTimer;
+   // private CollisionShape2D _hitboxCollisionShape;
+    //private Sprite2D _alertSprite;
 
     private readonly CallableStateMachine _stateMachine = new();
     private uint _defaultCollisionMask;
@@ -47,22 +47,22 @@ public partial class Enemy : CharacterBody2D
 
     public override void _Ready()
     {
-        _targetAcquisitionTimer = GetNode<Timer>("TargetAvquisitionTimer");
-        _healthComponent = GetNode<HealthComponent>("HealthComponent");
-        _visuals = GetNode<Node2D>("Visuals");
-        _attackCooldownTimer = GetNode<Timer>("AttackCoolDownTimer");
-        _chargeAttackTimer = GetNode<Timer>("ChargeAttackTimer");
-        _hitboxCollisionShape = GetNode<CollisionShape2D>("HitboxComponent/HitboxCollisionShape");
-        _alertSprite = GetNode<Sprite2D>("AlertSprite");
+        //_targetAcquisitionTimer = GetNode<Timer>("TargetAvquisitionTimer");
+        //_healthComponent = GetNode<HealthComponent>("HealthComponent");
+        //_visuals = GetNode<Node2D>("Visuals");
+        //_attackCooldownTimer = GetNode<Timer>("AttackCoolDownTimer");
+        //_chargeAttackTimer = GetNode<Timer>("ChargeAttackTimer");
+        //_hitboxCollisionShape = GetNode<CollisionShape2D>("HitboxComponent/HitboxCollisionShape");
+       // _alertSprite = GetNode<Sprite2D>("AlertSprite");
 
         _defaultCollisionMask = CollisionMask;
         _defaultCollisionLayer = CollisionLayer;
-        _hitboxCollisionShape.Disabled = true;
-        _alertSprite.Scale = Vector2.Zero;
+        _.HitboxComponent.HitboxCollisionShape.Disabled = true;
+        _.AlertSprite.Scale = Vector2.Zero;
 
         if (IsMultiplayerAuthority())
         {
-            _healthComponent.Died += OnDied;
+            _.HealthComponent.Died += OnDied;
             _stateMachine.SetInitialState(nameof(StateSpawn));
         }
     }
@@ -80,7 +80,7 @@ public partial class Enemy : CharacterBody2D
     private async void EnterStateSpawn()
     {
         Tween tween = CreateTween();
-        tween.TweenProperty(_visuals, "scale", Vector2.One, 0.4f)
+        tween.TweenProperty(_.Visuals.Get(), "scale", Vector2.One, 0.4f)
             .From(Vector2.Zero)
             .SetEase(Tween.EaseType.Out)
             .SetTrans(Tween.TransitionType.Back);
@@ -98,7 +98,7 @@ public partial class Enemy : CharacterBody2D
         if (IsMultiplayerAuthority())
         {
             AcquireTarget();
-            _targetAcquisitionTimer.Start();
+            _.TargetAvquisitionTimer.Start();
         }
     }
 
@@ -108,13 +108,13 @@ public partial class Enemy : CharacterBody2D
         {
             Velocity = GlobalPosition.DirectionTo(TargetPosition) * 40.0f;
 
-            if (_targetAcquisitionTimer.IsStopped())
+            if (_.TargetAvquisitionTimer.IsStopped())
             {
                 AcquireTarget();
-                _targetAcquisitionTimer.Start();
+                _.TargetAvquisitionTimer.Start();
             }
 
-            if (_attackCooldownTimer.IsStopped() && GlobalPosition.DistanceTo(TargetPosition) < 150.0f)
+            if (_.AttackCoolDownTimer.IsStopped() && GlobalPosition.DistanceTo(TargetPosition) < 150.0f)
             {
                 _stateMachine.ChangeState(nameof(StateChargeAttack));
             }
@@ -128,7 +128,7 @@ public partial class Enemy : CharacterBody2D
         if (IsMultiplayerAuthority())
         {
             AcquireTarget();
-            _chargeAttackTimer.Start();
+            _.ChargeAttackTimer.Start();
         }
 
         if (_alertTween != null && _alertTween.IsValid())
@@ -137,7 +137,7 @@ public partial class Enemy : CharacterBody2D
         }
 
         _alertTween = CreateTween();
-        _alertTween.TweenProperty(_alertSprite, "scale", Vector2.One, 0.2f)
+        _alertTween.TweenProperty(_.AlertSprite, "scale", Vector2.One, 0.2f)
             .SetEase(Tween.EaseType.Out)
             .SetTrans(Tween.TransitionType.Back);
     }
@@ -148,7 +148,7 @@ public partial class Enemy : CharacterBody2D
         {
             Velocity = Velocity.Lerp(Vector2.Zero, 1.0f - Mathf.Exp(-15.0f * (float)GetProcessDeltaTime()));
 
-            if (_chargeAttackTimer.IsStopped())
+            if (_.ChargeAttackTimer.IsStopped())
             {
                 _stateMachine.ChangeState(nameof(StateAttack));
             }
@@ -165,7 +165,7 @@ public partial class Enemy : CharacterBody2D
         }
 
         _alertTween = CreateTween();
-        _alertTween.TweenProperty(_alertSprite, "scale", Vector2.Zero, 0.2f)
+        _alertTween.TweenProperty(_.AlertSprite, "scale", Vector2.Zero, 0.2f)
             .SetEase(Tween.EaseType.In)
             .SetTrans(Tween.TransitionType.Back);
     }
@@ -179,7 +179,7 @@ public partial class Enemy : CharacterBody2D
 
         CollisionMask = 1u << 0;
         CollisionLayer = 0;
-        _hitboxCollisionShape.Disabled = false;
+        _.HitboxComponent.HitboxCollisionShape.Disabled = false;
         Velocity = GlobalPosition.DirectionTo(TargetPosition) * 400.0f;
     }
 
@@ -205,13 +205,13 @@ public partial class Enemy : CharacterBody2D
 
         CollisionMask = _defaultCollisionMask;
         CollisionLayer = _defaultCollisionLayer;
-        _hitboxCollisionShape.Disabled = true;
-        _attackCooldownTimer.Start();
+        _.HitboxComponent.HitboxCollisionShape.Disabled = true;
+        _.AttackCoolDownTimer.Start();
     }
 
     private void Flip()
     {
-        _visuals.Scale = TargetPosition.X > GlobalPosition.X ? Vector2.One : new Vector2(-1.0f, 1.0f);
+        _.Visuals.Get().Scale = TargetPosition.X > GlobalPosition.X ? Vector2.One : new Vector2(-1.0f, 1.0f);
     }
 
     private void AcquireTarget()
