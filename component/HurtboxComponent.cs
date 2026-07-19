@@ -12,7 +12,12 @@ public partial class HurtboxComponent : Area2D
     {
         AreaEntered += OnAreaEntered;
     }
-
+    
+    private void handleHit(HitboxComponent hitboxComponent)
+    {
+        hitboxComponent.RegisterHurtboxHit(this);
+        HealthComponent.Damage(hitboxComponent.Damage); 
+    }
     private void OnAreaEntered(Area2D otherArea)
     {
         if (!IsMultiplayerAuthority() || otherArea is not HitboxComponent hitboxComponent)
@@ -20,7 +25,6 @@ public partial class HurtboxComponent : Area2D
             return;
         }
 
-        hitboxComponent.RegisterHurtboxHit(this);
-        HealthComponent.Damage(hitboxComponent.Damage);
+        CallDeferred( nameof(handleHit), otherArea);
     }
 }

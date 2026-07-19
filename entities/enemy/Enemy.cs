@@ -180,7 +180,7 @@ public partial class Enemy : CharacterBody2D
         CollisionMask = 1u << 0;
         CollisionLayer = 0;
         _.HitboxComponent.HitboxCollisionShape.Disabled = false;
-        Velocity = GlobalPosition.DirectionTo(TargetPosition) * 400.0f;
+        Velocity = GlobalPosition.DirectionTo(TargetPosition) * 40.0f;
     }
 
     private void StateAttack()

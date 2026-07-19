@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace MatchTastic;
@@ -11,6 +14,8 @@ public partial class Main : Node
     private Marker2D _playerSpawnPosition;
     private EnemyManager _enemyManager;
 
+    private List<int> deadPeers = new List<int>();
+
     public override void _Ready()
     {
         _multiplayerSpawner = GetNode<MultiplayerSpawner>("MultiplayerSpawner");
@@ -19,7 +24,11 @@ public partial class Main : Node
 
         _multiplayerSpawner.SpawnFunction = Callable.From<Variant, Node>(SpawnPlayer);
         RpcId(1, MethodName.PeerReady);
+
+        _enemyManager.RoundComplete += OnRoundComplete;
     }
+
+
 
     private Node SpawnPlayer(Variant data)
     {
@@ -31,9 +40,26 @@ public partial class Main : Node
         player.InputMultiplayerAuthority = peerId;
         player.GlobalPosition = _playerSpawnPosition.GlobalPosition;
         GD.Print($"Spawning player for peer {peerId} at position {player.GlobalPosition}");
+        
+        if (IsMultiplayerAuthority())
+        {
+            player.Died += ()=> OnPlayerDied(peerId);
+        }
+
         return player;
     }
 
+    private void RespawnDeadPeers()
+    {
+        GD.Print("RespawnDeadPeers");
+        foreach (int peerId in deadPeers)
+        {
+            GD.Print($"Respawning {peerId}");
+            _multiplayerSpawner.Spawn(new Godot.Collections.Dictionary { { "peer_id", peerId } });
+        } 
+        deadPeers = [];
+    }
+    
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void PeerReady()
     {
@@ -42,4 +68,21 @@ public partial class Main : Node
         _multiplayerSpawner.Spawn(new Godot.Collections.Dictionary { { "peer_id", senderId } });
         _enemyManager.Synchronize(senderId);
     }
+
+    void OnPlayerDied(int peerId)
+    {
+                
+        GD.Print($"OnPlayerDied {peerId}");
+        deadPeers.Add(peerId);
+
+        GD.Print($"deadPeers {deadPeers.Count}");
+    }
+
+    private void OnRoundComplete()
+    {
+        GD.Print("OnRoundComplete");
+        RespawnDeadPeers();
+        //CallDeferred(nameof(RespawnDeadPeers));
+    }
+
 }

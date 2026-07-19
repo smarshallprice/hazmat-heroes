@@ -8,6 +8,9 @@ public partial class EnemyManager : Node
     [Signal]
     public delegate void RoundChangedEventHandler(int roundNumber);
 
+    [Signal]
+    public delegate void RoundCompleteEventHandler();
+
     private const int RoundBaseTime = 10;
     private const int RoundGrowth = 5;
     private const float BaseEnemySpawnTime = 2.0f;
@@ -131,6 +134,8 @@ public partial class EnemyManager : Node
         if (_spawnedEnemies == 0)
         {
             GD.Print("round complete");
+            //EmitSignalRoundComplete();
+            EmitSignal(SignalName.RoundComplete);
             BeginRound();
         }
     }

@@ -6,6 +6,9 @@ namespace MatchTastic;
 [GlobalClass, SceneTree]
 public partial class Player : CharacterBody2D
 {
+    [Signal]
+    public delegate void DiedEventHandler();
+
     public int InputMultiplayerAuthority { get; set; }
 
     private readonly PackedScene _bulletScene = GD.Load<PackedScene>("uid://bpomv1fpftth5");
@@ -22,7 +25,7 @@ public partial class Player : CharacterBody2D
     public override void _Ready()
     {
         GD.Print($"Scene path: {SceneFilePath}");
-    GD.Print($"Parent: {GetParent()}");
+        GD.Print($"Parent: {GetParent()}");
 
         //_playerInputSynchronizer = GetNode<PlayerInputSynchronizerComponent>("PlayerInputSynchronizerComponent");
         //WeaponRoot =  _.Visuals.WeaponRoot. GetNode<Node2D>("Visuals/WeaponRoot");
@@ -33,7 +36,10 @@ public partial class Player : CharacterBody2D
         //_barrelPosition = GetNode<Marker2D>("Visuals/WeaponRoot/WeaponAnimationRoot/BarrelPosition");
         barrelPosition = _.Visuals.WeaponRoot.WeaponAnimationRoot.BarrelPosition;
         _.PlayerInputSynchronizerComponent.SetMultiplayerAuthority(InputMultiplayerAuthority, true);
-        _.HealthComponent.Died += OnDied;
+        if (IsMultiplayerAuthority())
+        {
+            _.HealthComponent.Died += OnDied;        
+        }
     }
 
     public override void _Process(double _delta)
@@ -100,6 +106,12 @@ public partial class Player : CharacterBody2D
 
     private void OnDied()
     {
+        if (IsMultiplayerAuthority())
+        {
+            
         GD.Print("player died");
+        EmitSignal(SignalName.Died);
+        QueueFree();
+        }
     }
 }
