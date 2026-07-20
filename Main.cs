@@ -8,7 +8,10 @@ namespace MatchTastic;
 [GlobalClass]
 public partial class Main : Node
 {
+    const string MAIN_MENU_SCENE_PATH = "res://ui/main_menu/main_menu.tscn";
     private readonly PackedScene _playerScene = GD.Load<PackedScene>("uid://13coq8nj1c80");
+    //private readonly PackedScene mainMenuScene = GD.Load<PackedScene>("uid://bhuy3ga7evxc6");
+
 
     private MultiplayerSpawner _multiplayerSpawner;
     private Marker2D _playerSpawnPosition;
@@ -26,7 +29,9 @@ public partial class Main : Node
         RpcId(1, MethodName.PeerReady);
 
         _enemyManager.RoundComplete += OnRoundComplete;
+        Multiplayer.ServerDisconnected += OnServerDisconnected; // Only set to the peers
     }
+
 
 
 
@@ -69,13 +74,44 @@ public partial class Main : Node
         _enemyManager.Synchronize(senderId);
     }
 
+    private void EndGame()
+    {
+        //Multiplayer.MultiplayerPeer = null; //Kills the server and all clients
+        Multiplayer.MultiplayerPeer = new OfflineMultiplayerPeer();
+
+        GetTree().ChangeSceneToFile(MAIN_MENU_SCENE_PATH);
+
+    }
+
+    private void CheckGameOver()
+    {
+        bool isGameover = true;
+        //get list of all peers
+        //if all peer id exist in dead peer list
+        int[] allPeers = [1, ..Multiplayer.GetPeers()];
+        
+        foreach (var connectedPeer in allPeers) //GetPeers does not return all peers, it excludes self
+        {
+            if (!deadPeers.Contains(connectedPeer))
+            {
+                isGameover = false;
+                break;
+            }
+        }
+
+        if (isGameover)
+        {
+            //terminate server and peers
+            EndGame();
+        }
+    }
+
     void OnPlayerDied(int peerId)
     {
                 
         GD.Print($"OnPlayerDied {peerId}");
         deadPeers.Add(peerId);
-
-        GD.Print($"deadPeers {deadPeers.Count}");
+        CheckGameOver();
     }
 
     private void OnRoundComplete()
@@ -85,4 +121,8 @@ public partial class Main : Node
         //CallDeferred(nameof(RespawnDeadPeers));
     }
 
+    private void OnServerDisconnected()
+    {
+        EndGame();
+    }
 }

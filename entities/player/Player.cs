@@ -22,6 +22,8 @@ public partial class Player : CharacterBody2D
     //private AnimationPlayer _animationPlayer;
     private Marker2D barrelPosition;
 
+    private bool isDying = false;
+
     public override void _Ready()
     {
         GD.Print($"Scene path: {SceneFilePath}");
@@ -47,15 +49,22 @@ public partial class Player : CharacterBody2D
         UpdateAimPosition();
 
         if (IsMultiplayerAuthority())
-        {
-           
+        {           
             Velocity = _.PlayerInputSynchronizerComponent.MovementVector * 100.0f;
             MoveAndSlide();
+
+            if (isDying)
+            {
+                GlobalPosition = Vector2.Right * 1000; //see kill method for why we do this
+                return;
+            }
 
             if (_.PlayerInputSynchronizerComponent.IsAttackPressed)
             {
                 TryFire();
             }
+
+           
         }
     }
 
@@ -104,14 +113,29 @@ public partial class Player : CharacterBody2D
         GetParent().AddChild(muzzleFlash);
     }
 
-    private void OnDied()
+
+    [Rpc(
+        MultiplayerApi.RpcMode.Authority,
+        CallLocal = true,
+        TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void Kill()
     {
-        if (IsMultiplayerAuthority())
-        {
+        isDying = true;
+        //whether sync should be visible to all peers. This will stop broadcasting to the server.
+        _.PlayerInputSynchronizerComponent.PublicVisibility = false;
+        //remove player from arean, but keep in tree
+        //so we will move the player offscreen in process method
+    }
+
+    private async void OnDied()
+    {
+        // we have to do this to tell client you have died on the server, so stop stending input so we can QueueFree your node.
+        //we have to do this because while the server Queue Frees the node, the client can still send input to a removed node
+        KillRpc();
+        await ToSignal(GetTree().CreateTimer(0.5), Timer.SignalName.Timeout);
             
         GD.Print("player died");
         EmitSignal(SignalName.Died);
-        QueueFree();
-        }
+        QueueFree();        
     }
 }
