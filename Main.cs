@@ -18,6 +18,7 @@ public partial class Main : Node
     private EnemyManager _enemyManager;
 
     private List<int> deadPeers = new List<int>();
+    private Godot.Collections.Dictionary<int, Player> playerDictionary = new();
 
     public override void _Ready()
     {
@@ -30,7 +31,11 @@ public partial class Main : Node
 
         _enemyManager.RoundComplete += OnRoundComplete;
         Multiplayer.ServerDisconnected += OnServerDisconnected; // Only set to the peers
+
+        //if a client peer disconnects, we will consider them dead and check if the game is over
+        Multiplayer.PeerDisconnected += onPeerDisconnected;
     }
+
 
 
 
@@ -51,14 +56,18 @@ public partial class Main : Node
             player.Died += ()=> OnPlayerDied(peerId);
         }
 
+        playerDictionary.Add(peerId, player);
+
         return player;
     }
 
     private void RespawnDeadPeers()
     {
         GD.Print("RespawnDeadPeers");
+        var allPeers = GetAllPeers();
         foreach (int peerId in deadPeers)
         {
+            if (!allPeers.Contains(peerId)) continue; // it is possible for there to be a dead peer that is no longer connected
             GD.Print($"Respawning {peerId}");
             _multiplayerSpawner.Spawn(new Godot.Collections.Dictionary { { "peer_id", peerId } });
         } 
@@ -86,11 +95,9 @@ public partial class Main : Node
     private void CheckGameOver()
     {
         bool isGameover = true;
-        //get list of all peers
-        //if all peer id exist in dead peer list
-        int[] allPeers = [1, ..Multiplayer.GetPeers()];
+      
         
-        foreach (var connectedPeer in allPeers) //GetPeers does not return all peers, it excludes self
+        foreach (var connectedPeer in GetAllPeers()) //GetPeers does not return all peers, it excludes self
         {
             if (!deadPeers.Contains(connectedPeer))
             {
@@ -104,6 +111,14 @@ public partial class Main : Node
             //terminate server and peers
             EndGame();
         }
+    }
+
+    int[] GetAllPeers()
+    {
+        //get list of all peers
+        //if all peer id exist in dead peer list
+        int[] allPeers = [1, ..Multiplayer.GetPeers()];
+        return allPeers;
     }
 
     void OnPlayerDied(int peerId)
@@ -124,5 +139,24 @@ public partial class Main : Node
     private void OnServerDisconnected()
     {
         EndGame();
+    }
+
+    private void onPeerDisconnected(long peerId)
+    {
+        // GD.Print($"Peer {peerId} disconnected");
+        // deadPeers.Add((int)peerId);
+        // CheckGameOver();
+        //we could do this to get the player at that path, but we are going to use a dict instead
+        //var player = GetNode<Player>($"YSortRoot/{peerId}");
+
+        if (playerDictionary.ContainsKey((int)peerId)) // added in video 45
+        {
+            var player = playerDictionary[(int) peerId];
+            if (IsInstanceValid(player))// checks if player is not null, and it is a valid node. Meaning it hasn't been freed yet
+            {                
+                playerDictionary[(int)peerId].Kill();   
+            }
+            playerDictionary.Remove((int)peerId);
+        }
     }
 }

@@ -113,12 +113,29 @@ public partial class Player : CharacterBody2D
         GetParent().AddChild(muzzleFlash);
     }
 
+    public async void Kill()
+    {
+        if (!IsMultiplayerAuthority())
+        {
+           GD.PushError("Cannmot call kill on non-server client"); 
+           return;
+        }
+
+        // we have to do this to tell client you have died on the server, so stop stending input so we can QueueFree your node.
+        //we have to do this because while the server Queue Frees the node, the client can still send input to a removed node
+        _KillRpc();
+        await ToSignal(GetTree().CreateTimer(0.5), Timer.SignalName.Timeout);
+            
+        GD.Print("player died");
+        EmitSignal(SignalName.Died);
+        QueueFree();        
+    }
 
     [Rpc(
         MultiplayerApi.RpcMode.Authority,
         CallLocal = true,
         TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void Kill()
+    private void _Kill()
     {
         isDying = true;
         //whether sync should be visible to all peers. This will stop broadcasting to the server.
@@ -129,13 +146,6 @@ public partial class Player : CharacterBody2D
 
     private async void OnDied()
     {
-        // we have to do this to tell client you have died on the server, so stop stending input so we can QueueFree your node.
-        //we have to do this because while the server Queue Frees the node, the client can still send input to a removed node
-        KillRpc();
-        await ToSignal(GetTree().CreateTimer(0.5), Timer.SignalName.Timeout);
-            
-        GD.Print("player died");
-        EmitSignal(SignalName.Died);
-        QueueFree();        
+        Kill();
     }
 }
