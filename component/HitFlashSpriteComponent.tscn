@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://06ca7mpcewrj"]
+
+[ext_resource type="Shader" uid="uid://cdsaw5dgsyptl" path="res://resources/shader/HitFlash.gdshader" id="1_oocmp"]
+[ext_resource type="Script" uid="uid://fm6c7xr7rglr" path="res://component/HitFlashSpriteComponent.cs" id="2_oocmp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pa4cc"]
+resource_local_to_scene = true
+shader = ExtResource("1_oocmp")
+shader_parameter/percent = 0.0
+
+[node name="HitFlashSpriteComponent" type="Sprite2D" unique_id=279363385]
+material = SubResource("ShaderMaterial_pa4cc")
+script = ExtResource("2_oocmp")
